@@ -4,6 +4,8 @@ import {
   nhanVienLocal,
   saveLocal,
   checkValid,
+  resetForm,
+  findIndexNV,
 } from "./controller.js";
 import { xepLoaiNV, NhanVien } from "./model.js";
 
@@ -42,7 +44,18 @@ document.getElementById("btnThemNV").addEventListener("click", () => {
 
   if (checkValue) {
     danhSachNhanVien.push(newNV);
-    renderListNV(danhSachNhanVien);
     saveLocal(danhSachNhanVien);
+    renderListNV(danhSachNhanVien);
+    resetForm();
   }
 });
+
+// Xóa NhanVien
+const deleteNV = (taiKhoan) => {
+  const index = findIndexNV(danhSachNhanVien, taiKhoan);
+  if (index !== -1) {
+    danhSachNhanVien.splice(index, 1);
+    saveLocal(danhSachNhanVien);
+    renderListNV(danhSachNhanVien);
+  }
+};

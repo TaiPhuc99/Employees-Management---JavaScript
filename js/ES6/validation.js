@@ -1,3 +1,6 @@
+import { NhanVien } from "./model.js";
+import { danhSachNhanVien } from "./main.js";
+
 export const message = [
   "Không được để rỗng",
   "Độ dài tối thiểu",

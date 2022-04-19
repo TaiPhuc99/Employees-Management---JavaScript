@@ -1,5 +1,5 @@
 // Array Notification
-export const xepLoaiNV = ["Xuất Sắc", "Giỏi", "Khá", "Trung Bình"];
+export const xepLoaiNV = ["XUẤT SẮC", "GIỎI", "KHÁ", "TRUNG BÌNH"];
 
 // Class NV
 export class NhanVien {
@@ -24,23 +24,23 @@ export class NhanVien {
   }
 
   tongLuong() {
-    checkPositionValue(this.chucVu);
+    return checkPositionValue(this.chucVu, this.luongCoBan);
   }
 
   xepLoai() {
-    checkType(this.gioLam * 1);
+    return checkType(this.gioLam * 1);
   }
 }
 
 // Function tongLuong
-export const checkPositionValue = (positionValue) => {
+export const checkPositionValue = (positionValue, base) => {
   switch (positionValue) {
     case 1:
-      return NhanVien.luongCoBan * 3;
+      return base * 3;
     case 2:
-      return NhanVien.luongCoBan * 2;
+      return base * 2;
     case 3:
-      return NhanVien.luongCoBan * 1;
+      return base * 1;
   }
 };
 

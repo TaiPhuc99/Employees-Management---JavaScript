@@ -53,31 +53,41 @@ export const renderListNV = (array) => {
       }
     };
 
-    const transformTongLuong = (first) => {
-      second;
-    };
+    // Initialize new Object before utilizing its method
+    let nhanVienMoi = new NhanVien(
+      item.taiKhoan,
+      item.hoTen,
+      item.email,
+      item.matKhau,
+      item.ngayLam,
+      item.luongCoBan,
+      item.chucVu,
+      item.gioLam
+    );
 
     let contentTr = `
       <tr>
-        <td>${item.taiKhoan}</td>
-        <td>${item.hoTen}</td>
-        <td>${item.email}</td>
-        <td>${item.ngayLam}</td>
+        <td>${nhanVienMoi.taiKhoan}</td>
+        <td>${nhanVienMoi.hoTen}</td>
+        <td>${nhanVienMoi.email}</td>
+        <td>${nhanVienMoi.ngayLam}</td>
         <td>${transformPosition()}</td>
-        <td>${item.tongLuong}</td>
-        <td>${item.xepLoai}</td>
+        <td>${nhanVienMoi.tongLuong()}</td>
+        <td>${nhanVienMoi.xepLoai()}</td>
         <td>
-          <button class="btn-primary text-white mb-3" id="${item.taiKhoan}">
+          <button class="btn-primary text-white mb-3">
             <em class="fa fa-pencil"></em>
           </button>
-          <button class="btn-warning text-white" id="${item.taiKhoan}">
+          <button
+            class="btn-warning text-white"
+            onclick="deleteNV(${nhanVienMoi.taiKhoan})"
+          >
             <em class="fa fa-trash"></em>
           </button>
         </td>
       </tr>
     `;
     contentHTML += contentTr;
-    console.log(array);
   });
 
   document.getElementById("tableDanhSach").innerHTML = contentHTML;
@@ -135,4 +145,20 @@ export const checkValid = (
   ) {
     return true;
   } else return false;
+};
+
+// Reset Thông Tin Form User
+export const resetForm = () => {
+  const inputs = document.querySelectorAll(".input-sm");
+  for (let input of inputs) {
+    input.value = "";
+  }
+  document.getElementById("chucvu").selectedIndex = 0;
+};
+
+// Find out Index NV
+export const findIndexNV = (array, index) => {
+  return array.findIndex((item) => {
+    item.taiKhoan === index;
+  });
 };
