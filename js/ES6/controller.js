@@ -11,7 +11,7 @@ import {
   checkPosition,
   checkRangeNumber,
 } from "./validation.js";
-import { danhSachNhanVien, deleteNV, findIndexNV, editNV } from "./main.js";
+import { danhSachNhanVien, deleteNV, editNV } from "./main.js";
 
 // Open Modal
 export const callModal = (title, type) => {
@@ -58,32 +58,12 @@ export const getInfo = () => {
 };
 
 // Render List NV (Table)
-let currentPage = 1;
 export const renderListNV = (array) => {
-  // Pagnation
-  const totalNV = array.length;
-  const trNum = 3;
-  let ulPagnation = "";
-  const totalPageNum = Math.floor(totalNV / trNum);
-
-  for (let i = 0; i < totalPageNum; i++) {
-    let contenLi = `
-    <li>
-      <a class="page-link" id="Trang_${i + 1}">${i + 1}</a>
-    </li>
-  `;
-    ulPagnation += contenLi;
-    loadPage("Trang_" + i + 1);
-  }
-  document.getElementById("ulPhanTrang").innerHTML = ulPagnation;
-  const start = (currentPage - 1) * trNum;
-  const end = currentPage * trNum;
-
   let contentHTML = "";
   // Change selectedIndex <==> Value
-  for (const index = start; index < end; index++) {
+  array.forEach((item) => {
     const transformPosition = () => {
-      const position = array[index].chucVu;
+      const position = item.chucVu;
       switch (position) {
         case 1:
           return "Sếp";
@@ -96,14 +76,14 @@ export const renderListNV = (array) => {
 
     // Initialize new Object before utilizing its method
     let nhanVienMoi = new NhanVien(
-      array[index].taiKhoan,
-      array[index].hoTen,
-      array[index].email,
-      array[index].matKhau,
-      array[index].ngayLam,
-      array[index].luongCoBan,
-      array[index].chucVu,
-      array[index].gioLam
+      item.taiKhoan,
+      item.hoTen,
+      item.email,
+      item.matKhau,
+      item.ngayLam,
+      item.luongCoBan,
+      item.chucVu,
+      item.gioLam
     );
 
     // Create table for renderring
@@ -135,7 +115,7 @@ export const renderListNV = (array) => {
       </tr>
     `;
     contentHTML += contentTr;
-  }
+  });
   document.getElementById("tableDanhSach").innerHTML = contentHTML;
 };
 
@@ -146,9 +126,21 @@ export const saveLocal = (array) => {
   localStorage.setItem(nhanVienLocal, json);
 };
 
-// Check all Validation of all inputs
-export const checkValid = (
-  account,
+// Check only Validation Account
+export const checkValidAccount = (account) => {
+  const accountValid =
+    checkEmpty(account, "tbTKNV") &&
+    checkNumber(account, "tbTKNV") &&
+    checkLength(account, "tbTKNV", 4, 6) &&
+    checkDuplicate(account, danhSachNhanVien, "tbTKNV");
+
+  if (accountValid) {
+    return true;
+  } else return false;
+};
+
+// Check other validation
+export const checkValidOther = (
   name,
   email,
   password,
@@ -157,11 +149,6 @@ export const checkValid = (
   position,
   workTime
 ) => {
-  const accountValid =
-    checkEmpty(account, "tbTKNV") &&
-    checkNumber(account, "tbTKNV") &&
-    checkLength(account, "tbTKNV", 4, 6) &&
-    checkDuplicate(account, danhSachNhanVien, "tbTKNV");
   const nameValid = checkEmpty(name, "tbTen") && checkWord(name, "tbTen");
   const emailValid =
     checkEmpty(email, "tbEmail") && checkEmail(email, "tbEmail");
@@ -181,7 +168,6 @@ export const checkValid = (
     checkRangeNumber(workTime, "tbGiolam", 80, 200);
 
   if (
-    accountValid &&
     nameValid &&
     emailValid &&
     passwordValid &&
@@ -208,6 +194,13 @@ export const resetForm = () => {
   }
 };
 
+// Find out Index NV in Array danhSachNhanVien
+export const findIndexNV = (index) => {
+  return danhSachNhanVien.findIndex((item) => {
+    return item.taiKhoan === index;
+  });
+};
+
 // Sort NhanVien
 export const sortNV = (type) => {
   const x = Number();
@@ -230,13 +223,4 @@ export const sortNV = (type) => {
       else return 0;
     });
   }
-};
-
-const loadPage = (idPage) => {
-  document.getElementById(idPage).addEventListener("click", () => {
-    const id = idPage;
-    const tempArr = id.split("_");
-    currentPage = tempArr[1];
-    renderListNV(danhSachNhanVien);
-  });
 };

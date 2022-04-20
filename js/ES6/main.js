@@ -3,10 +3,12 @@ import {
   renderListNV,
   nhanVienLocal,
   saveLocal,
-  checkValid,
+  checkValidAccount,
+  checkValidOther,
   resetForm,
   sortNV,
   callModal,
+  findIndexNV,
 } from "./controller.js";
 import { NhanVien, xepLoaiNV } from "./model.js";
 
@@ -40,8 +42,8 @@ document.getElementById("btnThemNV").addEventListener("click", () => {
   );
 
   // Validation all inputs
-  const checkValue = checkValid(
-    newNV.taiKhoan,
+  const checkValueAccount = checkValidAccount(newNV.taiKhoan);
+  const checkValueOther = checkValidOther(
     newNV.hoTen,
     newNV.email,
     newNV.matKhau,
@@ -51,7 +53,7 @@ document.getElementById("btnThemNV").addEventListener("click", () => {
     newNV.gioLam
   );
 
-  if (checkValue) {
+  if (checkValueAccount && checkValueOther) {
     danhSachNhanVien.push(newNV);
     saveLocal(danhSachNhanVien);
     renderListNV(danhSachNhanVien);
@@ -59,24 +61,20 @@ document.getElementById("btnThemNV").addEventListener("click", () => {
   }
 });
 
-// Find out Index NV in Array danhSachNhanVien
-export const findIndexNV = (index) => {
-  return danhSachNhanVien.findIndex((item) => {
-    item.taiKhoan === index;
-  });
-};
-
 // Delete NhanVien
 export const deleteNV = (taiKhoan) => {
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(taiKhoan);
-
+  console.log(index);
+  console.log(taiKhoan);
+  // console.log(danhSachNhanVien[0].taiKhoan);
   if (index !== -1) {
     danhSachNhanVien.splice(index, 1);
     saveLocal(danhSachNhanVien);
     renderListNV(danhSachNhanVien);
   }
 };
+window.deleteNV = deleteNV;
 
 // Edit Button => back data NV selected
 export const editNV = (taiKhoan) => {
@@ -85,7 +83,6 @@ export const editNV = (taiKhoan) => {
 
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(taiKhoan);
-
   if (index !== -1) {
     const nhanVien = danhSachNhanVien[index];
     document.getElementById("tknv").value = nhanVien.taiKhoan;
@@ -99,14 +96,16 @@ export const editNV = (taiKhoan) => {
     document.getElementById("gioLam").value = nhanVien.gioLam;
   }
 };
+window.editNV = editNV;
 
 // Update NV
 document.getElementById("btnCapNhat").addEventListener("click", () => {
   // Get taiKhoan of current Value
   const account = document.getElementById("tknv").value;
-
+  console.log(account);
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(account);
+  console.log(index);
 
   if (index !== -1) {
     let valueForm = getInfo();
@@ -122,11 +121,22 @@ document.getElementById("btnCapNhat").addEventListener("click", () => {
       valueForm.position,
       valueForm.workTime
     );
-    danhSachNhanVien[index] = newNV;
-    saveLocal(danhSachNhanVien);
-    renderListNV(danhSachNhanVien);
-    resetForm();
-    document.getElementById("tknv").disabled = false;
+    const checkValueOther = checkValidOther(
+      newNV.hoTen,
+      newNV.email,
+      newNV.matKhau,
+      newNV.ngayLam,
+      newNV.luongCoBan,
+      newNV.chucVu,
+      newNV.gioLam
+    );
+    if (checkValueOther) {
+      danhSachNhanVien[index] = newNV;
+      saveLocal(danhSachNhanVien);
+      renderListNV(danhSachNhanVien);
+      resetForm();
+      document.getElementById("tknv").disabled = false;
+    }
   }
 });
 
