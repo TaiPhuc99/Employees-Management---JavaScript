@@ -11,7 +11,27 @@ import {
   checkPosition,
   checkRangeNumber,
 } from "./validation.js";
-import { danhSachNhanVien } from "./main.js";
+import { danhSachNhanVien, deleteNV, findIndexNV, editNV } from "./main.js";
+
+// Open Modal
+export const callModal = (title, type) => {
+  document.getElementById("header-title").innerText = title;
+
+  switch (type) {
+    case 1:
+      document.getElementById("btnCapNhat").style.display = "none";
+      document.getElementById("btnThemNV").style.display = "block";
+      document.getElementById("btnThemNV").style.width = "50%";
+      document.getElementById("btnDong").style.width = "50%";
+      break;
+    case 2:
+      document.getElementById("btnCapNhat").style.display = "block";
+      document.getElementById("btnThemNV").style.display = "none";
+      document.getElementById("btnCapNhat").style.width = "50%";
+      document.getElementById("btnDong").style.width = "50%";
+      break;
+  }
+};
 
 // Get Info from HTML
 export const getInfo = () => {
@@ -24,6 +44,7 @@ export const getInfo = () => {
   let position = document.getElementById("chucvu").selectedIndex;
   let workTime = document.getElementById("gioLam").value;
 
+  // Return all above values == object with keys = values
   return {
     account,
     name,
@@ -37,12 +58,32 @@ export const getInfo = () => {
 };
 
 // Render List NV (Table)
+let currentPage = 1;
 export const renderListNV = (array) => {
-  let contentHTML = "";
+  // Pagnation
+  const totalNV = array.length;
+  const trNum = 3;
+  let ulPagnation = "";
+  const totalPageNum = Math.floor(totalNV / trNum);
 
-  array.forEach((item) => {
+  for (let i = 0; i < totalPageNum; i++) {
+    let contenLi = `
+    <li>
+      <a class="page-link" id="Trang_${i + 1}">${i + 1}</a>
+    </li>
+  `;
+    ulPagnation += contenLi;
+    loadPage("Trang_" + i + 1);
+  }
+  document.getElementById("ulPhanTrang").innerHTML = ulPagnation;
+  const start = (currentPage - 1) * trNum;
+  const end = currentPage * trNum;
+
+  let contentHTML = "";
+  // Change selectedIndex <==> Value
+  for (const index = start; index < end; index++) {
     const transformPosition = () => {
-      const position = item.chucVu;
+      const position = array[index].chucVu;
       switch (position) {
         case 1:
           return "Sếp";
@@ -55,16 +96,17 @@ export const renderListNV = (array) => {
 
     // Initialize new Object before utilizing its method
     let nhanVienMoi = new NhanVien(
-      item.taiKhoan,
-      item.hoTen,
-      item.email,
-      item.matKhau,
-      item.ngayLam,
-      item.luongCoBan,
-      item.chucVu,
-      item.gioLam
+      array[index].taiKhoan,
+      array[index].hoTen,
+      array[index].email,
+      array[index].matKhau,
+      array[index].ngayLam,
+      array[index].luongCoBan,
+      array[index].chucVu,
+      array[index].gioLam
     );
 
+    // Create table for renderring
     let contentTr = `
       <tr>
         <td>${nhanVienMoi.taiKhoan}</td>
@@ -75,12 +117,17 @@ export const renderListNV = (array) => {
         <td>${nhanVienMoi.tongLuong()}</td>
         <td>${nhanVienMoi.xepLoai()}</td>
         <td>
-          <button class="btn-primary text-white mb-3">
+          <button
+            class="btn-primary text-white mb-3"
+            data-toggle="modal"
+            data-target="#myModal"
+            onclick="editNV('${nhanVienMoi.taiKhoan}')"
+          >
             <em class="fa fa-pencil"></em>
           </button>
           <button
             class="btn-warning text-white"
-            onclick="deleteNV(${nhanVienMoi.taiKhoan})"
+            onclick="deleteNV('${nhanVienMoi.taiKhoan}')"
           >
             <em class="fa fa-trash"></em>
           </button>
@@ -88,8 +135,7 @@ export const renderListNV = (array) => {
       </tr>
     `;
     contentHTML += contentTr;
-  });
-
+  }
   document.getElementById("tableDanhSach").innerHTML = contentHTML;
 };
 
@@ -100,6 +146,7 @@ export const saveLocal = (array) => {
   localStorage.setItem(nhanVienLocal, json);
 };
 
+// Check all Validation of all inputs
 export const checkValid = (
   account,
   name,
@@ -154,11 +201,42 @@ export const resetForm = () => {
     input.value = "";
   }
   document.getElementById("chucvu").selectedIndex = 0;
+  const notifications = document.querySelectorAll(".sp-thongbao");
+  for (let notification of notifications) {
+    notification.innerText = "";
+    notification.style.display = "none";
+  }
 };
 
-// Find out Index NV
-export const findIndexNV = (array, index) => {
-  return array.findIndex((item) => {
-    item.taiKhoan === index;
+// Sort NhanVien
+export const sortNV = (type) => {
+  const x = Number();
+  if (type === 1) {
+    // Increase
+    danhSachNhanVien.sort((a, b) => {
+      const x = Number(a.taiKhoan);
+      const y = Number(b.taiKhoan);
+      if (x < y) return -1;
+      else if (x > y) return 1;
+      else return 0;
+    });
+  } else {
+    // Decrease
+    danhSachNhanVien.sort((a, b) => {
+      const x = Number(a.taiKhoan);
+      const y = Number(b.taiKhoan);
+      if (x < y) return 1;
+      else if (x > y) return -1;
+      else return 0;
+    });
+  }
+};
+
+const loadPage = (idPage) => {
+  document.getElementById(idPage).addEventListener("click", () => {
+    const id = idPage;
+    const tempArr = id.split("_");
+    currentPage = tempArr[1];
+    renderListNV(danhSachNhanVien);
   });
 };

@@ -24,10 +24,12 @@ export class NhanVien {
   }
 
   tongLuong() {
+    // Must return a value
     return checkPositionValue(this.chucVu, this.luongCoBan);
   }
 
   xepLoai() {
+    // Must return a value
     return checkType(this.gioLam * 1);
   }
 }

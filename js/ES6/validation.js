@@ -1,6 +1,3 @@
-import { NhanVien } from "./model.js";
-import { danhSachNhanVien } from "./main.js";
-
 export const message = [
   "Không được để rỗng",
   "Độ dài tối thiểu",
@@ -43,7 +40,7 @@ export const checkLength = (string, idErr, min, max) => {
 
 export const checkDuplicate = (idNew, array, idErr) => {
   const index = array.findIndex((item) => {
-    item.taiKhoan === idNew;
+    return item.taiKhoan === idNew;
   });
   if (index !== -1) {
     document.getElementById(idErr).innerText = message[3];
@@ -56,9 +53,12 @@ export const checkDuplicate = (idNew, array, idErr) => {
 };
 
 export const checkWord = (string, idErr) => {
-  const regexWord = /^[A-Za-z]+$/;
-  const valid = regexWord.test(string);
-  if (valid) {
+  const regexWord =
+    "^[a-zA-Z_ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶ" +
+    "ẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợ" +
+    "ụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\\s]+$";
+  // const regexWordvalid = regexWord.test(string);
+  if (string.match(regexWord)) {
     document.getElementById(idErr).style.display = "none";
     return true;
   } else {
@@ -97,7 +97,9 @@ export const checkEmail = (string, idErr) => {
 
 export const checkPassword = (string, idErr) => {
   const regexPassword =
-    /^(?=.*?[A-Z])(?=.*[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&amp;*-])(?=.{6,})$/;
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$/;
+  // "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{6,10}$";
+  // "^(?=.*?[A-Z])(?=.*[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&amp;*-])(?=.{6,})$";
   const valid = regexPassword.test(string);
   if (valid) {
     document.getElementById(idErr).style.display = "none";
