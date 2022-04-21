@@ -23,6 +23,7 @@ if (json) {
 // Calling Modal
 document.getElementById("btnThem").addEventListener("click", () => {
   callModal("THÊM NHÂN VIÊN", 1);
+  resetForm();
 });
 
 // Add newNV
@@ -65,9 +66,7 @@ document.getElementById("btnThemNV").addEventListener("click", () => {
 export const deleteNV = (taiKhoan) => {
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(taiKhoan);
-  console.log(index);
-  console.log(taiKhoan);
-  // console.log(danhSachNhanVien[0].taiKhoan);
+
   if (index !== -1) {
     danhSachNhanVien.splice(index, 1);
     saveLocal(danhSachNhanVien);
@@ -81,15 +80,23 @@ export const editNV = (taiKhoan) => {
   // Calling Modal First
   callModal("CẬP NHẬT NHÂN VIÊN", 2);
 
+  // Reset all Noty-Span if have
+  const notifications = document.querySelectorAll(".sp-thongbao");
+  for (let notification of notifications) {
+    notification.innerText = "";
+    notification.style.display = "none";
+  }
+
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(taiKhoan);
+
   if (index !== -1) {
     const nhanVien = danhSachNhanVien[index];
     document.getElementById("tknv").value = nhanVien.taiKhoan;
     document.getElementById("tknv").disabled = true;
     document.getElementById("name").value = nhanVien.hoTen;
     document.getElementById("email").value = nhanVien.email;
-    document.getElementById("password").value = nhanVien.password;
+    document.getElementById("password").value = nhanVien.matKhau;
     document.getElementById("datepicker").value = nhanVien.ngayLam;
     document.getElementById("luongCB").value = nhanVien.luongCoBan;
     document.getElementById("chucvu").selectedIndex = nhanVien.chucVu;
@@ -102,10 +109,9 @@ window.editNV = editNV;
 document.getElementById("btnCapNhat").addEventListener("click", () => {
   // Get taiKhoan of current Value
   const account = document.getElementById("tknv").value;
-  console.log(account);
+
   // Check vị trí của taiKhoan đã có/không trong danhSachNhanVien
   const index = findIndexNV(account);
-  console.log(index);
 
   if (index !== -1) {
     let valueForm = getInfo();
@@ -130,12 +136,13 @@ document.getElementById("btnCapNhat").addEventListener("click", () => {
       newNV.chucVu,
       newNV.gioLam
     );
+
     if (checkValueOther) {
       danhSachNhanVien[index] = newNV;
-      saveLocal(danhSachNhanVien);
       renderListNV(danhSachNhanVien);
       resetForm();
       document.getElementById("tknv").disabled = false;
+      saveLocal(danhSachNhanVien);
     }
   }
 });

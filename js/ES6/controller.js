@@ -10,6 +10,7 @@ import {
   checkPassword,
   checkPosition,
   checkRangeNumber,
+  checkValidDate,
 } from "./validation.js";
 import { danhSachNhanVien, deleteNV, editNV } from "./main.js";
 
@@ -134,9 +135,7 @@ export const checkValidAccount = (account) => {
     checkLength(account, "tbTKNV", 4, 6) &&
     checkDuplicate(account, danhSachNhanVien, "tbTKNV");
 
-  if (accountValid) {
-    return true;
-  } else return false;
+  return accountValid;
 };
 
 // Check other validation
@@ -153,10 +152,9 @@ export const checkValidOther = (
   const emailValid =
     checkEmpty(email, "tbEmail") && checkEmail(email, "tbEmail");
   const passwordValid =
-    checkEmpty(password, "tbMatKhau") &&
-    // checkPassword(password, "tbMatKhau") &&
-    checkLength(password, "tbMatKhau", 6, 10);
-  const onBoardDayValid = checkEmpty(onBoardDay, "tbNgay");
+    checkEmpty(password, "tbMatKhau") && checkPassword(password, "tbMatKhau");
+  const onBoardDayValid =
+    checkEmpty(onBoardDay, "tbNgay") && checkValidDate(onBoardDay, "tbNgay");
   const basicValid =
     checkEmpty(basic, "tbLuongCB") &&
     checkNumber(basic, "tbLuongCB") &&
@@ -192,6 +190,14 @@ export const resetForm = () => {
     notification.innerText = "";
     notification.style.display = "none";
   }
+  document.getElementById("tknv").disabled = false;
+  const date = new Date();
+  document.getElementById("datepicker").value =
+    (date.getMonth() > 8 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1)) +
+    "/" +
+    (date.getDate() > 9 ? date.getDate() : "0" + date.getDate()) +
+    "/" +
+    date.getFullYear();
 };
 
 // Find out Index NV in Array danhSachNhanVien
